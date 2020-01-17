@@ -17,6 +17,35 @@ OPTIONS:
     -b, --board-id <ID>      The ID of the board where the cards are meant to be counted from.
     -f, --filter <FILTER>    Removes all list with a name that contains the substring FILTER
 #+END_SRC
+** About
+card-counter is a CLI app that looks at a Trello board and generates some summary statistics about your lists.
+
+*** How it works
+1. It filters out lists that contain the substring supplied as a filter
+2. It iterates over each card in the list and looks for numbers surrounded by round brackets `()` and square brackets `[]`
+3. It uses the round brackets to get an estimate effort for completing the card and uses the square brackets as a correction to the effort estimate.
+4. It uses this information to summarize four points of information for a list:
+   - cards: The number of cards in a list
+   - score: The total effort expended this sprint. This is calculated by summing all estimates specified in the card, trying first to use the estimate correction number, `[]` and then, if that does not exist it uses the effort estimate number, `()`.
+   - estimate: The original estimated effort for all cards in a list. This uses `()`.
+   - unscored: the number of cards that were unscored in the list.
+
+After running card-counter you should get a list that looks like:
+#+BEGIN_EXAMPLE
++-------------------------+-------+-------+-----------+----------+
+| List                    | cards | score | estimated | unscored |
++-------------------------+-------+-------+-----------+----------+
+| This Sprint             | 2     | 4     | 4         | 1        |
++-------------------------+-------+-------+-----------+----------+
+| Implementation          | 5     | 14    | 14        | 1        |
++-------------------------+-------+-------+-----------+----------+
+| Implementation Complete | 8     | 30    | 30        | 3        |
++-------------------------+-------+-------+-----------+----------+
+| Released (Done)         | 9     | 10    | 10        | 5        |
++-------------------------+-------+-------+-----------+----------+
+#+END_EXAMPLE
+
+
 ** Run
 To run card-counter it expects to have your ~trello api key~ and ~trello api token~ stored as ~env vars~ ~TRELLO_API_KEY~ and ~TRELLO_API_TOKEN~. For further documentation on how to get an api key and token from trello, read the documentation at https://developers.trello.com/page/authorization.
 #+BEGIN_SRC bash
